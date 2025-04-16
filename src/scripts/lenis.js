@@ -1,9 +1,11 @@
 import Lenis from "lenis";
 import { getScrollTops, getMostVisibleElement } from "@lib/utils";
+import { navigate } from "astro:transitions/client";
+import { act } from "react";
 function createLenis() {
 	const scrollTops = getScrollTops();
 	let activeSection = null;
-	console.log(scrollTops);
+
 	let scroll = 0;
 	const lenis = new Lenis({
 		autoRaf: true,
@@ -25,6 +27,9 @@ function createLenis() {
 			);
 			oldActive?.classList.remove("activeMenu");
 			newActive?.classList.add("activeMenu");
+			console.log("lasturl", urlMostVisible);
+			activeSection = urlMostVisible;
+			history.replaceState(null, "", urlMostVisible);
 		}
 	});
 

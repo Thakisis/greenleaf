@@ -1,0 +1,300 @@
+---
+import headerVideo from "../assets/header_video.webm";
+import logo from "../assets/logo.svg";
+import logoRaw from "../assets/logo_animation.svg?raw";
+---
+
+<div id="header">
+	<nav
+		id="menu"
+		class="navbar fixed-top navbar-expand-md justify-content-center"
+	>
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#"
+				><img id="nav-logo" src={logo.src} /></a
+			>
+			<button
+				class="navbar-toggler"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#navbarNav"
+				aria-controls="navbarNav"
+				aria-expanded="false"
+				aria-label="Toggle navigation"
+			>
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="nav navbar-nav justify-content-center">
+					<li class="nav-item">
+						<a class="nav-link" href="#section1">Section 1</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#section2">Section 2</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#section3">Section 3</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div id="header-center">
+		<div id="logo-container" ">
+			<Fragment set:html={logoRaw} />
+		</div>
+		<a href="#section1"
+			><div id="scroll-button"><span id="triangle"></span></div></a
+		>
+	</div>
+
+	<video id="video" autoplay muted src={headerVideo}> </video>
+</div>
+
+<script>
+	import { escapeHTML } from "astro/runtime/server/escape.js";
+	import { animate, stagger, svg } from "../scripts/anime.esm.min";
+
+	// Needed since caps have to become round after the animation starts, otherwise a circle is drawn
+	function setRoundCap(path) {
+		path.forEach((p) => {
+			p.style.strokeLinecap = "round";
+		});
+	}
+
+	function getDrawConfig(duration, delay) {
+		return {
+			draw: ["0 0", "0 1"],
+			ease: "inOutQuad",
+			duration: duration,
+			delay: delay,
+			onBegin: (self) => {
+				setRoundCap(self.targets);
+			},
+			loop: false,
+		};
+	}
+
+	document.addEventListener("DOMContentLoaded", () => {
+		const video = document.getElementById("video");
+		const logoContainer = document.getElementById("logo-container");
+		const logo = document.getElementsByTagName("svg")[0];
+		const paths = [...logo.getElementsByTagName("path")];
+		const G = logo.getElementById("G");
+		const G_stroke = logo.getElementById("G-stroke");
+		const G_fill = logo.getElementById("G-fill");
+		const G_nerves = logo.getElementById("G-nerves");
+		const R = logo.getElementById("R");
+		const E1 = logo.getElementById("E1");
+		const E2 = logo.getElementById("E2");
+		const N = logo.getElementById("N");
+		const L = logo.getElementById("L");
+		const E3 = logo.getElementById("E3");
+		const A = logo.getElementById("A");
+		const F = logo.getElementById("F");
+		const letters = [R, E1, E2, N, L, E3, A, F];
+		const scrollButton = document.getElementById("scroll-button");
+
+		// When the video ends, update the UI
+
+		if (video && logoContainer && scrollButton) {
+			video.addEventListener("ended", () => {
+				// Show the logo
+				logoContainer.classList.add("played");
+				// add "played" class to scroll button
+				// scrollButton.classList.add("played");
+				// Update the scroll button
+				// scrollButton.innerHTML = "Discover More";
+				// Play logo animation
+				animate(svg.createDrawable(G_stroke), getDrawConfig(2000, 0));
+				animate(
+					svg.createDrawable(G_nerves),
+					getDrawConfig(2000, 1000),
+				);
+				letters.forEach((letter, index) => {
+					animate(
+						svg.createDrawable(letter),
+						getDrawConfig(1000, 2000 + index * 200),
+					);
+				});
+				animate(svg.createDrawable(G_fill), {
+					opacity: [0, 1],
+					duration: 1000,
+					delay: 2000 + letters.length * 200 + 1000,
+					onComplete: () => {
+						[G, ...letters].forEach((letter, i) => {
+							animate(letter, {
+							translateY: [0, -5, 0],
+							loop: true,
+							ease: 'inOutSine',
+							delay: i * 100,
+							duration: 3000
+						});
+						});
+						
+					},
+				});
+			});
+
+			video.currentTime = video.duration - 2; // Skip to the last 2 seconds
+		}
+	});
+</script>
+
+<style is:global>
+	svg {
+		width: 70vh;
+		max-width: 75vw;
+		height: auto;
+		transition: all 0.5s ease;
+		overflow: visible;
+
+		path {
+			stroke-linecap: butt;
+			stroke: #f8ece1 !important;
+			filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.2));
+		}
+	}
+</style>
+
+<style>
+	a {
+		text-decoration: none;
+	}
+	#nav-logo {
+		height: 50px;
+		max-height: 80%;
+		margin-left: 10px;
+	}
+	#header {
+		top: 0;
+		left: 0;
+		width: 100%;
+		overflow: hidden;
+		height: 100vh;
+		position: relative;
+		box-shadow: 0 0 100px rgba(0, 0, 0, 0.6) inset;
+		display: flex;
+		justify-content: center;
+	}
+	#video {
+		height: 100vh;
+		min-width: 100%;
+		object-fit: cover;
+		object-position: top;
+		top: 0;
+		left: 0;
+		z-index: -1;
+	}
+	#logo-container {
+		opacity: 0;
+		transition: all 0.5s ease;
+		margin-bottom: 20px;
+
+		&.played {
+			opacity: 1;
+		}
+	}
+	#video-space {
+		display: block;
+		height: 100vh;
+		position: relative;
+	}
+	nav {
+		background-color: rgba(255, 255, 255, 0.5);
+		backdrop-filter: blur(10px);
+	}
+	.nav-item {
+		background-color: rgba(255, 255, 255, 0);
+		margin: 1em;
+	}
+	.nav-link {
+		transition: all 0.2s ease;
+		transform-origin: left;
+		color: #7f7f7f;
+		font-size: larger;
+		font-weight: 600;
+		&.active {
+			transform: scale(1.4);
+			color: #ef857d !important;
+		}
+	}
+	#menu {
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+	}
+	.navbar-brand {
+		padding-right: 0;
+		font-size: 2em;
+		transform: translatey(-10%);
+	}
+	#header-center {
+		height: 100%;
+		display: flex;
+		position: absolute;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+	}
+
+	#scroll-button {
+		display: block;
+		top: 50%;
+		left: 50%;
+		min-width: 150px;
+		min-height: 150px;
+		width: auto;
+		height: auto;
+		background-color: rgba(200, 200, 200, 0.1);
+		backdrop-filter: blur(6px);
+		border: 3px solid white;
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+		border-radius: 999px;
+		cursor: pointer;
+		transition: all 0.5s ease;
+		align-content: center;
+		text-decoration: none !important;
+		font-size: 2em;
+		color: white;
+
+		&:hover {
+			background-color: rgba(200, 200, 200, 0.5);
+			box-shadow:
+				0 0 10px #f8ece1,
+				0 0 40px rgba(0, 0, 0, 0.3);
+			transform: scale(1.05);
+		}
+		&.played {
+			min-width: 0;
+			min-height: 0;
+			padding: 20px;
+		}
+	}
+	#triangle {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translateX(-50%) translateY(-35%) rotate(180deg);
+		width: 0;
+		height: 0;
+		border-left: 40px solid transparent;
+		border-right: 40px solid transparent;
+		border-bottom: 40px solid white;
+	}
+
+	@media (min-width: 768px) {
+		/* Video becomes 100% height in desktop */
+		nav {
+			height: 5em;
+		}
+		#navbarNav {
+			flex-grow: 0;
+		}
+		.container-fluid {
+			width: 100%;
+			justify-content: center !important;
+		}
+		.nav-link {
+			transform-origin: center;
+		}
+	}
+</style>

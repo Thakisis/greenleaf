@@ -1,0 +1,15 @@
+---
+import LogoNavbar from '@components/logo-navbar.astro';
+import NavLink from './nav-link.astro';
+import { menuslist } from '@config/menus';
+
+---
+<div class="fixed flex h-15 inset-x-0 top-0 z-50 flex justify-center items-center px-4 py-2 ">
+    <div class="container h-full flex items-center justify-between ">
+    <div class="flex h-full "><LogoNavbar  /></div>
+    <nav class="flex items-center space-x-4" id="mainnav">
+        {menuslist.map((item)=><NavLink text={item.name} url={item.url} />)}
+    </nav>
+</nav>
+
+</div>

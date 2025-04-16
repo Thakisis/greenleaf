@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+::view-transition-group(*) {
+    animation: none;
+}
+
+@layer base {
+
+    .activeMenu {
+        @apply bg-blue-500 text-white;
+    }
+}

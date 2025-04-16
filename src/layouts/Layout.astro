@@ -1,6 +1,8 @@
 ---
 
 import '../styles/global.css'
+import Navbar from '@components/nav-bar.astro';
+import { ClientRouter,ViewTransitions } from "astro:transitions";
 ---
 <!doctype html>
 <html lang="en">
@@ -10,8 +12,11 @@ import '../styles/global.css'
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
+		<script src="@scripts/lenis.js"></script>
+			<ClientRouter />
 	</head>
-	<body data-bs-spy="scroll" data-bs-target="#navbarNav" data-offset="0">
+	<body >
+		<Navbar />
 		<slot />
 	</body>
 </html>

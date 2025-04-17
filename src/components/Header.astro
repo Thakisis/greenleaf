@@ -1,10 +1,90 @@
 ---
 import headerVideo from "../assets/header_video.webm";
-import logo from "../assets/logo.svg";
-import logoRaw from "../assets/logo_animation.svg?raw";
+import HeaderLogo from "./header-logo.astro";
 ---
 
-<div class="h-screen w-full" id="hero">
-    <video id="video" autoplay muted src={headerVideo} class="w-full h-full object-fit" transition:persist> </video>
+<div class="h-screen w-full grid grid-overlay relative" id="hero">
+	<video
+		id="video"
+		autoplay
+		muted
+		src={headerVideo}
+		class="w-full h-screen object-cover xl:object-contain object-bottom"
+		transition:persist
+	>
+	</video>
+	<div class="absolute w-full h-screen flex justify-center items-center">
+		<HeaderLogo class="w-[70vw] max-w-[75vw] h-auto" style={{ opacity: 0 }} />
+	</div>
 </div>
 
+<script>
+	import { createObjProxy } from "@lib/utils";
+	import { animate, stagger, svg } from "../scripts/anime.esm.min";
+	const logo = createObjProxy([
+		"logo-hero",
+		"R",
+		"E1",
+		"E2",
+		"N",
+		"L",
+		"E3",
+		"A",
+		"F",
+		"G",
+		"G-stroke",
+		"G-nerves",
+		"G-fill",
+	]);
+
+	const video = document.getElementById("video");
+	video.addEventListener("ended", () => AnimateLogo());
+
+	function setRoundCap(path) {
+		path.forEach((p) => {
+			p.style.strokeLinecap = "round";
+		});
+	}
+
+	function getDrawConfig(duration, delay) {
+		return {
+			draw: ["0 0", "0 1"],
+			ease: "inOutQuad",
+			duration: duration,
+			delay: delay,
+			onBegin: (self) => {
+				setRoundCap(self.targets);
+			},
+			loop: false,
+		};
+	}
+	function AnimateLogo() {
+		logo.logoHero.style.opacity = 1;
+		logo.log();
+		animate(svg.createDrawable(logo.gStroke), getDrawConfig(2000, 0));
+		animate(svg.createDrawable(logo.gNerves), getDrawConfig(2000, 1000));
+		const letters = document.querySelectorAll(".letter");
+		letters.forEach((letter, index) => {
+			animate(
+				svg.createDrawable(letter),
+				getDrawConfig(1000, 2000 + index * 200)
+			);
+		});
+		animate(svg.createDrawable(logo.gFill), {
+			opacity: [0, 1],
+			duration: 1000,
+			delay: 2000 + letters.length * 200 + 1000,
+			onComplete: () => {
+				[logo.G, ...letters].forEach((letter, i) => {
+					animate(letter, {
+						translateY: [0, -5, 0],
+						loop: true,
+						ease: "inOutSine",
+						delay: i * 100,
+						duration: 3000,
+					});
+				});
+			},
+		});
+	}
+</script>

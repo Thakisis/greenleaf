@@ -14,13 +14,16 @@ import HeaderLogo from "./header-logo.astro";
 	>
 	</video>
 	<div class="absolute w-full h-screen flex justify-center items-center">
-		<HeaderLogo class="w-[70vw] max-w-[75vw] h-auto" style={{ opacity: 0 }} />
+		<HeaderLogo
+			class="w-[70vw] max-w-[75vw] h-auto pointer-events-none"
+			style={{ opacity: 0 }}
+		/>
 	</div>
 </div>
 
 <script>
 	import { createObjProxy } from "@lib/utils";
-	import { animate, stagger, svg } from "../scripts/anime.esm.min";
+	import { animate, stagger, svg } from "animejs";
 	const logo = createObjProxy([
 		"logo-hero",
 		"R",
